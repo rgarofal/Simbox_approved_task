@@ -1,9 +1,6 @@
 package it.fastweb.simboxbatch;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -22,7 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jmx.export.MBeanExporter;
 
 import javax.sql.DataSource;
-import java.io.File;
+import java.io.*;
 import java.util.Date;
 import java.util.Vector;
 
@@ -41,7 +38,8 @@ public class SimboxConfiguration {
 
     private Session session;
     private ChannelSftp c;
-
+    private SimboxTimestampIdx s;
+    private Date maxDate;
 
     @Bean(name = "session")
     public Session openSession() {
@@ -96,7 +94,6 @@ public class SimboxConfiguration {
         itemReader.setRowMapper(new SimboxRowMapper());
         ExecutionContext executionContext = new ExecutionContext();
         itemReader.open(executionContext);
-        SimboxTimestampIdx s = null;
 
         try {
             s = (SimboxTimestampIdx) itemReader.read();
@@ -105,8 +102,9 @@ public class SimboxConfiguration {
         }
         itemReader.close();
 
-        System.out.println("************************* MAX DATE: " + s.getDate());
-        return s.getDate();
+        maxDate = s.getDate();
+        System.out.println("************************* MAX DATE: " + maxDate);
+        return maxDate;
     }
 
     @Bean(name = "simboxTempDir")
@@ -126,8 +124,9 @@ public class SimboxConfiguration {
         return stepBuilderFactory.get("step1")
                 .<Vector<ChannelSftp.LsEntry>, Vector<ChannelSftp.LsEntry>>chunk(1)
                 .reader(new SimboxReader(c))
-                .processor(new SimboxProcessor())
-                .writer(new SimboxWriter(session, c))
+                .processor(new SimboxProcessor(maxDate, c, session))
+                .writer(new SimboxWriter())
+                .startLimit(1)
                 .build();
     }
 

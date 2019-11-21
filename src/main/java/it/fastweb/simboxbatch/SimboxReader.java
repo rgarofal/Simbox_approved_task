@@ -11,10 +11,8 @@ import java.util.Vector;
 
 public class SimboxReader implements ItemReader<Vector<ChannelSftp.LsEntry>> {
 
-    final
-    ChannelSftp channel;
-
-    Vector<ChannelSftp.LsEntry> fileList;
+    private ChannelSftp channel;
+    private Vector<ChannelSftp.LsEntry> fileList;
 
     @Autowired
     public SimboxReader(ChannelSftp channel) {
