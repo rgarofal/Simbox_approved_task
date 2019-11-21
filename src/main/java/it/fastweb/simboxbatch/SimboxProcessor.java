@@ -1,21 +1,37 @@
 package it.fastweb.simboxbatch;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import com.jcraft.jsch.ChannelSftp;
 import org.springframework.batch.item.ItemProcessor;
-import java.io.File;
+import org.springframework.lang.Nullable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Vector;
 
-public class SimboxProcessor implements ItemProcessor<SimboxTimestampIdx, SimboxTimestampIdx> {
+public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry>, Vector<ChannelSftp.LsEntry>> {
 
+    private Date currentFileDate;
+
+    /**
+     * scorre tutti gli elementi dell'elenco. Estrae la data dal nome di ogni file esterno e la converte in Date
+     **/
+    @Nullable
     @Override
-    public SimboxTimestampIdx process(final SimboxTimestampIdx simbox) throws Exception {
+    public Vector<ChannelSftp.LsEntry> process(Vector<ChannelSftp.LsEntry> fileList) throws Exception {
 
-        System.out.println("////////////////////////////////// PROCESSOR");
-        File simboxTempDir = new File("C:\\Users\\delia\\IdeaProjects\\SimboxTemp");
-        if (simboxTempDir.mkdir()) {
-            System.out.println("Directory temporanea creata");
-        } else System.out.println("Directory temporanea già esistente");
+        fileList.forEach(f -> {
+            System.out.println("************** FILE CONVERT: " + f);
+            String dateFile = f.getAttrs().getMtimeString();
+            try {
+                currentFileDate = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(dateFile);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
-        return null;
+        });
+        return fileList;
     }
+
 
 }
