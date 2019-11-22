@@ -13,8 +13,7 @@ public class SimboxTimestampIdx {
     public SimboxTimestampIdx() {
     }
 
-    public SimboxTimestampIdx(Integer id, Date date, String folder, String filename, String dl) {
-        this.id = id;
+    public SimboxTimestampIdx(Date date, String folder, String filename, String dl) {
         this.date = date;
         this.folder = folder;
         this.filename = filename;

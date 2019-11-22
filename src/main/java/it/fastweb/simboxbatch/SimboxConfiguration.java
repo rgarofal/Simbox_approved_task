@@ -8,19 +8,21 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.*;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jmx.export.MBeanExporter;
 
 import javax.sql.DataSource;
-import java.io.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 @Configuration
@@ -37,7 +39,7 @@ public class SimboxConfiguration {
     private DataSource dataSource;
 
     private Session session;
-    private ChannelSftp c;
+    private ChannelSftp channelSftp;
     private SimboxTimestampIdx s;
     private Date maxDate;
 
@@ -75,14 +77,14 @@ public class SimboxConfiguration {
             channel.setOutputStream(System.out);
             channel.connect();
 
-            c = (ChannelSftp) channel;
+            channelSftp = (ChannelSftp) channel;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         System.out.println("************************* OPEN CHANNEL *************************");
-        return c;
+        return channelSftp;
     }
 
     @Bean(name = "maxDate")
@@ -107,26 +109,20 @@ public class SimboxConfiguration {
         return maxDate;
     }
 
-    @Bean(name = "simboxTempDir")
-    public File createDirectory() {
-
-        File simboxTempDir = new File("C:\\Users\\delia\\IdeaProjects\\SimboxTemp");
-        if (simboxTempDir.mkdir()) {
-            System.out.println("************************* Directory creata");
-        } else System.out.println("************************* Directory già esistente");
-
-        return simboxTempDir;
+    @Bean(name = "jdbcTemplate")
+    JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 
     @Bean
     public Step step1() {
 
         return stepBuilderFactory.get("step1")
-                .<Vector<ChannelSftp.LsEntry>, Vector<ChannelSftp.LsEntry>>chunk(1)
-                .reader(new SimboxReader(c))
-                .processor(new SimboxProcessor(maxDate, c, session))
-                .writer(new SimboxWriter())
-                .startLimit(1)
+                .<Vector<ChannelSftp.LsEntry>, List<SimboxTimestampIdx>>chunk(1)
+                .reader(new SimboxReader(channelSftp))
+                .processor(new SimboxProcessor(maxDate, channelSftp, session))
+                .writer(new SimboxWriter(jdbcTemplate(dataSource)))
+//                .startLimit(1)
                 .build();
     }
 
