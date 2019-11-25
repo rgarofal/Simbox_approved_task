@@ -18,7 +18,6 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
     private Date currentFileDate;
     private ChannelSftp channel;
     private Session session;
-    private List<SimboxTimestampIdx> newFileList = new ArrayList<>();
 
     @Autowired
     public SimboxProcessor(Date maxDate, ChannelSftp channel, Session session) {
@@ -30,7 +29,7 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
 
     /**
      * Scorre tutti gli elementi dell'elenco. Estrae la data dal nome di ogni file esterno e la converte in Date.
-     *
+     * Se il file è recente rispetto all'ultimo caricamento a Db, viene aggiunto in una lista
      **/
     @Nullable
     @Override
@@ -38,8 +37,9 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
 
         System.out.println("************************* PROCESSOR *************************");
 
+        List<SimboxTimestampIdx> newFileList = new ArrayList<>();
+
         fileList.forEach(f -> {
-            System.out.println("************** FILE CONVERT: " + f);
             String dateFile = f.getAttrs().getMtimeString();
 
             try {
@@ -61,7 +61,7 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
 
             }
         });
-        System.out.println("********** LISTAAAAAA " + newFileList.size());
+        System.out.println("********** LISTAAAAAA NEW " + newFileList.size());
 
         channel.exit();
         System.out.println("CHANNEL APERTO: " + channel.isConnected());
@@ -69,5 +69,8 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
         System.out.println("SESSION APERTA: " + session.isConnected());
 
         return newFileList;
+    }
+
+    public SimboxProcessor() {
     }
 }

@@ -44,4 +44,7 @@ public class SimboxReader implements ItemReader<Vector<ChannelSftp.LsEntry>> {
 
         return fileList;
     }
+
+    public SimboxReader() {
+    }
 }
