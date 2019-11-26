@@ -5,7 +5,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -18,14 +18,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jmx.export.MBeanExporter;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Date;
@@ -49,7 +44,6 @@ public class SimboxConfiguration {
 
     private Session session;
     private ChannelSftp channelSftp;
-    private SimboxTimestampIdx s;
     private Date maxDate;
 
     @Bean
@@ -67,6 +61,13 @@ public class SimboxConfiguration {
     @Bean
     public JobRepository jobRepository(MapJobRepositoryFactoryBean factory) throws Exception {
         return factory.getObject();
+    }
+
+    @Bean
+    public SimpleJobLauncher jobLauncher(JobRepository jobRepository) {
+        SimpleJobLauncher launcher = new SimpleJobLauncher();
+        launcher.setJobRepository(jobRepository);
+        return launcher;
     }
 
     @Bean(name = "session")
@@ -113,34 +114,35 @@ public class SimboxConfiguration {
         return channelSftp;
     }
 
-    @Bean(name = "maxDate")
-    public Date queryDate(final DataSource dataSource) {
-
-        JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
-        itemReader.setDataSource(dataSource);
-        itemReader.setSql("SELECT max(date) date FROM simbox_batch.simbox_timestamp_idx s WHERE s.folder = 'approved_csv';");
-        itemReader.setRowMapper(new SimboxRowMapper());
-        ExecutionContext executionContext = new ExecutionContext();
-        itemReader.open(executionContext);
-
-        try {
-            s = (SimboxTimestampIdx) itemReader.read();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        itemReader.close();
-
-        maxDate = s.getDate();
-        System.out.println("************************* MAX DATE: " + maxDate);
-        return maxDate;
-    }
+//    @Bean(name = "maxDate")
+//    public Date queryDate(final DataSource dataSource) {
+//
+//        JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
+//        itemReader.setDataSource(dataSource);
+//        itemReader.setSql("SELECT max(date) date FROM simbox_batch.simbox_timestamp_idx s WHERE s.folder = 'approved_csv';");
+//        itemReader.setRowMapper(new SimboxRowMapper());
+//        ExecutionContext executionContext = new ExecutionContext();
+//        itemReader.open(executionContext);
+//
+//        try {
+//            s = (SimboxTimestampIdx) itemReader.read();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        itemReader.close();
+//
+//        maxDate = s.getDate();
+//        System.out.println("************************* MAX DATE: " + maxDate);
+//        return maxDate;
+//    }
 
     @Bean(name = "jdbcTemplate")
     JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
-    @Scheduled(cron = "*/20 * * * * *")
+
+    @Scheduled(cron = "*/10 * * * * *")
     public void perform() throws Exception {
 
         System.out.println("Job Started at :" + new Date());
@@ -166,18 +168,15 @@ public class SimboxConfiguration {
     public Step step1() {
 
         return stepBuilderFactory.get("step1")
-                .<Vector<ChannelSftp.LsEntry>, List<SimboxTimestampIdx>>chunk(1)
-                .reader(new SimboxReader(channelSftp))
-                .processor(new SimboxProcessor(maxDate, channelSftp, session))
+                .<List<SimboxTimestampIdx>, List<SimboxTimestampIdx>>chunk(1)
+                .reader(new SimboxReader(dataSource, channelSftp, session))
+//                .processor(new SimboxProcessor(maxDate, channelSftp, session))
                 .writer(new SimboxWriter(jdbcTemplate(dataSource)))
+                .listener(new JobExecutionListener())
+//                .startLimit(1)
                 .build();
     }
 
 
-    @Bean
-    public SimpleJobLauncher jobLauncher(JobRepository jobRepository) {
-        SimpleJobLauncher launcher = new SimpleJobLauncher();
-        launcher.setJobRepository(jobRepository);
-        return launcher;
-    }
+
 }

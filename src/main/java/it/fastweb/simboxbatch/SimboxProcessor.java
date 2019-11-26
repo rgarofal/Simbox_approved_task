@@ -14,17 +14,17 @@ import java.util.*;
 
 public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry>, List<SimboxTimestampIdx>> {
 
-    private Date maxDate;
-    private Date currentFileDate;
-    private ChannelSftp channel;
-    private Session session;
-
-    @Autowired
-    public SimboxProcessor(Date maxDate, ChannelSftp channel, Session session) {
-        this.maxDate = maxDate;
-        this.channel = channel;
-        this.session = session;
-    }
+//    private Date maxDate;
+//    private Date currentFileDate;
+//    private ChannelSftp channel;
+//    private Session session;
+//
+//    @Autowired
+//    public SimboxProcessor(Date maxDate, ChannelSftp channel, Session session) {
+//        this.maxDate = maxDate;
+//        this.channel = channel;
+//        this.session = session;
+//    }
 
 
     /**
@@ -35,39 +35,39 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
     @Override
     public List<SimboxTimestampIdx> process(Vector<ChannelSftp.LsEntry> fileList) throws Exception {
 
-        System.out.println("************************* PROCESSOR *************************");
-
+//        System.out.println("************************* PROCESSOR *************************");
+//
         List<SimboxTimestampIdx> newFileList = new ArrayList<>();
-
-        fileList.forEach(f -> {
-            String dateFile = f.getAttrs().getMtimeString();
-
-            try {
-                currentFileDate = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(dateFile);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            SimboxTimestampIdx s = new SimboxTimestampIdx();
-
-            if (maxDate.compareTo(currentFileDate) < 0) {
-
-                s.setDate(currentFileDate);
-                s.setFolder("approved_csv");
-                s.setFilename(f.getFilename());
-                s.setDl("CSB.SimShelf@fastweb.it");
-
-                newFileList.add(s);
-
-            }
-        });
-        System.out.println("********** LISTAAAAAA NEW " + newFileList.size());
-
-        channel.exit();
-        System.out.println("CHANNEL APERTO: " + channel.isConnected());
-        session.disconnect();
-        System.out.println("SESSION APERTA: " + session.isConnected());
-
+//
+//        fileList.forEach(f -> {
+//            String dateFile = f.getAttrs().getMtimeString();
+//
+//            try {
+//                currentFileDate = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US).parse(dateFile);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//
+//            SimboxTimestampIdx s = new SimboxTimestampIdx();
+//
+//            if (maxDate.compareTo(currentFileDate) < 0) {
+//
+//                s.setDate(currentFileDate);
+//                s.setFolder("approved_csv");
+//                s.setFilename(f.getFilename());
+//                s.setDl("CSB.SimShelf@fastweb.it");
+//
+//                newFileList.add(s);
+//
+//            }
+//        });
+//        System.out.println("********** LISTAAAAAA NEW " + newFileList.size());
+//
+////        channel.exit();
+////        System.out.println("CHANNEL APERTO: " + channel.isConnected());
+////        session.disconnect();
+////        System.out.println("SESSION APERTA: " + session.isConnected());
+//
         return newFileList;
     }
 
