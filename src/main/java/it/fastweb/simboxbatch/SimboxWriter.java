@@ -1,5 +1,7 @@
 package it.fastweb.simboxbatch;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.Session;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -48,6 +50,4 @@ public class SimboxWriter implements ItemWriter<List<SimboxTimestampIdx>> {
         );
     }
 
-    public SimboxWriter() {
-    }
 }

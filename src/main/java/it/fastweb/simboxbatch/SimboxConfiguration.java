@@ -1,25 +1,31 @@
 package it.fastweb.simboxbatch;
 
 import com.jcraft.jsch.*;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.*;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jmx.export.MBeanExporter;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Date;
@@ -38,11 +44,30 @@ public class SimboxConfiguration {
     @Autowired
     @Qualifier("data_config")
     private DataSource dataSource;
+    @Autowired
+    private SimpleJobLauncher jobLauncher;
 
     private Session session;
     private ChannelSftp channelSftp;
     private SimboxTimestampIdx s;
     private Date maxDate;
+
+    @Bean
+    public ResourcelessTransactionManager transactionManager(){
+        return new ResourcelessTransactionManager();
+    }
+
+    @Bean
+    public MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean(ResourcelessTransactionManager txManager) throws Exception {
+        MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean(txManager);
+        factory.afterPropertiesSet();
+        return factory;
+    }
+
+    @Bean
+    public JobRepository jobRepository(MapJobRepositoryFactoryBean factory) throws Exception {
+        return factory.getObject();
+    }
 
     @Bean(name = "session")
     public Session openSession() {
@@ -115,6 +140,28 @@ public class SimboxConfiguration {
         return new JdbcTemplate(dataSource);
     }
 
+    @Scheduled(cron = "*/20 * * * * *")
+    public void perform() throws Exception {
+
+        System.out.println("Job Started at :" + new Date());
+
+        JobParameters param = new JobParametersBuilder().addString("JobID", String.valueOf(System.currentTimeMillis()))
+                .toJobParameters();
+
+        JobExecution execution = jobLauncher.run(importSimboxJob(), param);
+
+        System.out.println("Job finished with status :" + execution.getStatus());
+    }
+
+    @Bean
+    public Job importSimboxJob() {
+        return jobBuilderFactory.get("importSimboxJob")
+                .incrementer(new RunIdIncrementer())
+                .flow(step1())
+                .end()
+                .build();
+    }
+
     @Bean
     public Step step1() {
 
@@ -126,14 +173,11 @@ public class SimboxConfiguration {
                 .build();
     }
 
+
     @Bean
-    public Job importSimboxJob(Step step1) {
-        return jobBuilderFactory.get("importSimboxJob")
-                .incrementer(new RunIdIncrementer())
-                .flow(step1)
-                .end()
-                .build();
+    public SimpleJobLauncher jobLauncher(JobRepository jobRepository) {
+        SimpleJobLauncher launcher = new SimpleJobLauncher();
+        launcher.setJobRepository(jobRepository);
+        return launcher;
     }
-
-
 }

@@ -71,6 +71,4 @@ public class SimboxProcessor implements ItemProcessor<Vector<ChannelSftp.LsEntry
         return newFileList;
     }
 
-    public SimboxProcessor() {
-    }
 }
