@@ -5,17 +5,13 @@ import com.jcraft.jsch.Session;
 import org.springframework.batch.item.*;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.jmx.export.MBeanExporter;
 import org.springframework.lang.Nullable;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
+public class SimboxReader implements ItemReader<SimboxTimestampIdx> {
 
     private Vector<ChannelSftp.LsEntry> fileList;
     private Date currentFileDate;
@@ -23,6 +19,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
     private Session session;
     private SimboxTimestampIdx s;
     private DataSource dataSource;
+    int index = 0;
 
 
     @Autowired
@@ -37,7 +34,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
      **/
     @Nullable
     @Override
-    public List<SimboxTimestampIdx> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public SimboxTimestampIdx read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 
         System.out.println("************************* READ DIRECTORY *************************");
 
@@ -64,6 +61,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
         System.out.println("1111111111111111111111111111111111111111111111111111111111111111   HO RIFATTO LA QUERY " + maxDate);
 
+
         fileList.forEach(f -> {
             String dateFile = f.getAttrs().getMtimeString();
 
@@ -86,15 +84,25 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
             }
         });
-
         System.out.println("********** LISTAAAAAA NEW " + newFileList.size());
 
 //        channel.exit();
 //        System.out.println("CHANNEL APERTO: " + channel.isConnected());
 //        session.disconnect();
 //        System.out.println("SESSION APERTA: " + session.isConnected());
+        if (newFileList.size() > 0 && index < 3){
+            ++index;
+            SimboxTimestampIdx simboxTimestampIdx = newFileList.get(index-1);
 
-        return newFileList;
+            return simboxTimestampIdx;
+        } else {
+            System.out.println("Non ci sono elementi da mandare al writer");
+            return null;
+        }
+
+
+
+//        return newFileList;
 
     }
 

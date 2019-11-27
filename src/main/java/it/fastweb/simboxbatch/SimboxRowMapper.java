@@ -1,5 +1,6 @@
 package it.fastweb.simboxbatch;
 
+import it.fastweb.simboxbatch.SimboxTimestampIdx;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
