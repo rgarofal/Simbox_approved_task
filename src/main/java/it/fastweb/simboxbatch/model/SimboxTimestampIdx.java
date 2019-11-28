@@ -1,4 +1,4 @@
-package it.fastweb.simboxbatch;
+package it.fastweb.simboxbatch.model;
 
 import java.util.Date;
 
