@@ -52,4 +52,12 @@ public class SimboxWriter implements ItemWriter<List<SimboxTimestampIdx>> {
                 }
         );
     }
+
+    private String sendTMT (List<SimboxTimestampIdx> list) {
+
+
+
+
+        return null;
+    }
 }

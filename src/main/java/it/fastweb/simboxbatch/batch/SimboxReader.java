@@ -1,18 +1,26 @@
 package it.fastweb.simboxbatch.batch;
 
-        import com.jcraft.jsch.ChannelSftp;
-        import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
-        import it.fastweb.simboxbatch.config.SimboxRowMapper;
-        import org.slf4j.Logger;
-        import org.slf4j.LoggerFactory;
-        import org.springframework.batch.item.*;
-        import org.springframework.batch.item.database.JdbcCursorItemReader;
-        import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.lang.Nullable;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpException;
+import it.fastweb.simboxbatch.config.SimboxHttp;
+import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
+import it.fastweb.simboxbatch.config.SimboxRowMapper;
+import jdk.internal.util.xml.impl.Input;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.*;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 
-        import javax.sql.DataSource;
-        import java.text.SimpleDateFormat;
-        import java.util.*;
+import javax.sql.DataSource;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
@@ -45,6 +53,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
         }
 
         List<SimboxTimestampIdx> newFileList = new ArrayList<>();
+
         Date maxDate = queryDate(dataSource); //query DB
         log.info("Ultimi dati inseriti a Db in data: " + maxDate);
 
@@ -72,6 +81,8 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
                     s.setDl("CSB.SimShelf@fastweb.it");
 
                     newFileList.add(s);
+
+                    readFile(f); //legge il file e lo invia al TMT
                 }
             });
             log.info("************************* TOTALE FILE DA CARICARE : " + newFileList.size());
@@ -81,7 +92,9 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
             log.info("Non ci sono file da mandare al writer");
             return null;
         } else {
-            newFileList.forEach(f -> System.out.println("File da caricare: " + f.getFilename()));
+            newFileList.forEach(f -> {
+                System.out.println("File da caricare: " + f.getFilename());
+            });
             return newFileList;
         }
     }
@@ -103,5 +116,50 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
         itemReader.close();
 
         return s.getDate();
+    }
+
+    private String readFile(ChannelSftp.LsEntry f) {
+
+        File tmp = null;
+        String splitName = f.getFilename();
+        String csvFile = "";
+
+        try {
+            tmp = File.createTempFile(splitName, ".tmp");
+//            String [] data = splitName.split("(?<=.csv)");
+
+            InputStream in = null;
+            OutputStream out = null;
+
+            in = channel.get("/home/rco/inventia_w/approved_csv/" + f.getFilename());
+            out = new FileOutputStream(tmp);
+
+            byte[] buf = new byte[1024];
+            int len;
+
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+
+            Path p = Paths.get(tmp.getAbsolutePath());
+            File file = new File(String.valueOf(p));
+
+            csvFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
+            sendToTMT(csvFile);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return csvFile;
+    }
+
+    private String sendToTMT (String fileTmt) throws Exception {
+
+       SimboxHttp simboxHttp = new SimboxHttp();
+       simboxHttp.sendTicket(fileTmt);
+       return null;
     }
 }
