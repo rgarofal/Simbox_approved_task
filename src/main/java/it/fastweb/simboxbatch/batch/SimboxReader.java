@@ -1,11 +1,9 @@
 package it.fastweb.simboxbatch.batch;
 
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpException;
 import it.fastweb.simboxbatch.config.SimboxHttp;
 import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
 import it.fastweb.simboxbatch.config.SimboxRowMapper;
-import jdk.internal.util.xml.impl.Input;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,6 @@ import org.springframework.batch.item.*;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-
 import javax.sql.DataSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
