@@ -14,7 +14,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,9 +22,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jmx.export.MBeanExporter;
 import org.springframework.scheduling.annotation.Scheduled;
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class JobConfiguration {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
     @Autowired
-    @Qualifier("data_config")
+    @Qualifier("dataSource")
     private DataSource dataSource;
     @Autowired
     private SimpleJobLauncher jobLauncher;
@@ -48,11 +50,24 @@ public class JobConfiguration {
     ChannelSftp channelSftp;
 
     private static final Logger log = LoggerFactory.getLogger(JobConfiguration.class);
+    private static final JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+
 
     @Bean(name = "jdbcTemplate")
     JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
+
+//    @Bean(name = "dataSource")
+//    public DataSource batchDataSource() throws SQLException {
+//
+//        final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+//        dataSource.setDriver(new com.mysql.cj.jdbc.Driver());
+//        dataSource.setUrl("jdbc:mysql://localhost:3306/simbox_batch");
+//        dataSource.setUsername("root");
+//        dataSource.setPassword("root");
+//        return dataSource;
+//    }
 
     @Bean
     public ResourcelessTransactionManager transactionManager(){
@@ -60,15 +75,11 @@ public class JobConfiguration {
     }
 
     @Bean
-    public MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean(ResourcelessTransactionManager txManager) throws Exception {
-        MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean(txManager);
-        factory.afterPropertiesSet();
-        return factory;
-    }
-
-    @Bean
-    public JobRepository jobRepository(MapJobRepositoryFactoryBean factory) throws Exception {
-        return factory.getObject();
+    public JobRepository jobRepository(DataSource dataSource) throws Exception {
+        jobRepositoryFactoryBean.setDataSource(dataSource);
+        jobRepositoryFactoryBean.setTransactionManager(transactionManager());
+        jobRepositoryFactoryBean.setDatabaseType("MYSQL");
+        return jobRepositoryFactoryBean.getObject();
     }
 
     @Bean
@@ -78,7 +89,7 @@ public class JobConfiguration {
         return launcher;
     }
 
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 */2 * * * *")
     public void runJobScheduled() throws Exception {
 
         log.info("Job Started at :" + new Date());
@@ -104,11 +115,8 @@ public class JobConfiguration {
                 .<List<SimboxTimestampIdx>, List<SimboxTimestampIdx>>chunk(1)
                 .reader(new SimboxReader(dataSource, channelSftp))
                 .writer(new SimboxWriter(jdbcTemplate(dataSource)))
-                .listener(new JobExecutionListener())
+                .listener(new JobListener())
                 .startLimit(1)
                 .build();
     }
-
-
-
 }

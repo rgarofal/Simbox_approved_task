@@ -90,7 +90,6 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
             return null;
         } else {
             newFileList.forEach(f -> {
-                System.out.println("File da caricare: " + f.getFilename());
             });
             return newFileList;
         }

@@ -6,20 +6,16 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
+
 @Configuration
-public class JobExecutionListener implements StepExecutionListener {
+public class JobListener implements JobExecutionListener {
 
     private Session session;
     private ChannelSftp channelSftp;
-    private static final Logger log = LoggerFactory.getLogger(JobExecutionListener.class);
+    private static final Logger log = LoggerFactory.getLogger(JobListener.class);
 
     @Bean(name = "session")
     public Session openSession() {
@@ -66,24 +62,16 @@ public class JobExecutionListener implements StepExecutionListener {
     }
 
     @Override
-    public void beforeStep(StepExecution stepExecution) {
-        log.info("************************* BEFORE STEP *************************");
-        openSession();
-        openChannel();
+    public void beforeJob(JobExecution jobExecution) {
+
     }
 
-    @Nullable
     @Override
-    public ExitStatus afterStep(StepExecution stepExecution) {
+    public void afterJob(JobExecution jobExecution) {
         log.info("************************* AFTER STEP *************************");
         channelSftp.exit();
         log.info("Channel aperto: " + channelSftp.isConnected());
         session.disconnect();
         log.info("Sessione aperta: " + session.isConnected());
-        return null;
     }
-
-
-
-
 }

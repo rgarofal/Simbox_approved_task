@@ -6,9 +6,10 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
+//@Configuration
 public class DatabaseConfiguration {
 
-    @Bean(name="data_config")
+    @Bean(name = "dataSource")
     @Primary
     public DataSource batchDataSource() throws SQLException {
 
@@ -19,6 +20,4 @@ public class DatabaseConfiguration {
         dataSource.setPassword("root");
         return dataSource;
     }
-
-
 }
