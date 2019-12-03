@@ -85,7 +85,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
                     newFileList.add(s);
 
-//                    readFile(f); //legge il file e lo invia al TMT
+                    readFile(f); //legge il file e lo invia al TMT
                 }
             });
             log.info("************************* TOTALE FILE DA CARICARE : " + newFileList.size());
@@ -158,18 +158,12 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
             csvFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
-            sendToTMT(csvFile);
+            SimboxHttp simboxHttp = new SimboxHttp();
+            simboxHttp.sendTicket(csvFile);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return csvFile;
-    }
-
-    private String sendToTMT (String fileTmt) throws Exception {
-
-       SimboxHttp simboxHttp = new SimboxHttp();
-       simboxHttp.sendTicket(fileTmt);
-       return null;
     }
 }
