@@ -1,6 +1,8 @@
 package it.fastweb.simboxbatch.batch;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.Session;
+import it.fastweb.simboxbatch.config.JobListener;
 import it.fastweb.simboxbatch.config.SimboxHttp;
 import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
 import it.fastweb.simboxbatch.config.SimboxRowMapper;
@@ -23,15 +25,16 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
     private Vector<ChannelSftp.LsEntry> fileList;
     private Date currentFileDate;
-    private ChannelSftp channel;
     private SimboxTimestampIdx s;
     private DataSource dataSource;
+    private ChannelSftp channel;
+    private Session session;
+    private JobListener jobListener = new JobListener();
     private static final Logger log = LoggerFactory.getLogger(SimboxReader.class);
 
     @Autowired
-    public SimboxReader(DataSource dataSource, ChannelSftp channel) {
+    public SimboxReader(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.channel = channel;
     }
 
     /**
@@ -41,6 +44,9 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
     @Nullable
     @Override
     public List<SimboxTimestampIdx> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+
+        session = jobListener.openSession();
+        channel = jobListener.openChannel();
 
         try {
             channel.cd("/home/rco/inventia_w/approved_csv");
@@ -79,7 +85,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
                     newFileList.add(s);
 
-                    readFile(f); //legge il file e lo invia al TMT
+//                    readFile(f); //legge il file e lo invia al TMT
                 }
             });
             log.info("************************* TOTALE FILE DA CARICARE : " + newFileList.size());
@@ -87,10 +93,18 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
         if (newFileList.size() == 0) {
             log.info("Non ci sono file da mandare al writer");
+            session.disconnect();
+            channel.exit();
+            log.info("Sessione " + session.isConnected());
+            log.info("Channel " + channel.isConnected());
             return null;
         } else {
             newFileList.forEach(f -> {
             });
+            session.disconnect();
+            channel.exit();
+            log.info("Sessione " + session.isConnected());
+            log.info("Channel " + channel.isConnected());
             return newFileList;
         }
     }
@@ -99,7 +113,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
         JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
         itemReader.setDataSource(dataSource);
-        itemReader.setSql("SELECT max(date) date FROM simbox_batch.simbox_timestamp_idx s WHERE s.folder = 'approved_csv';");
+        itemReader.setSql("SELECT max(date) date FROM simbox_timestamp_idx s WHERE s.folder = 'approved_csv';");
         itemReader.setRowMapper(new SimboxRowMapper());
         ExecutionContext executionContext = new ExecutionContext();
         itemReader.open(executionContext);

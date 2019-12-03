@@ -9,7 +9,7 @@ import java.sql.SQLException;
 //@Configuration
 public class DatabaseConfiguration {
 
-    @Bean(name = "dataSource")
+    @Bean(name="data_config")
     @Primary
     public DataSource batchDataSource() throws SQLException {
 
@@ -18,6 +18,19 @@ public class DatabaseConfiguration {
         dataSource.setUrl("jdbc:mysql://localhost:3306/simbox_batch");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
+        dataSource.setSchema("simbox_batch");
+        return dataSource;
+    }
+
+    @Bean(name="data_business")
+    public DataSource businesDataSource() throws SQLException {
+
+        final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+        dataSource.setDriver(new com.mysql.cj.jdbc.Driver());
+        dataSource.setUrl("jdbc:mysql://localhost:3306/spr_batch_business");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+        dataSource.setSchema("spr_batch_business");
         return dataSource;
     }
 }

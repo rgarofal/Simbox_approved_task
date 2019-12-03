@@ -7,17 +7,14 @@ import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
 
-@Configuration
-public class JobListener implements JobExecutionListener {
+public class JobListener implements JobExecutionListener, StepExecutionListener{
 
     private Session session;
     private ChannelSftp channelSftp;
     private static final Logger log = LoggerFactory.getLogger(JobListener.class);
 
-    @Bean(name = "session")
     public Session openSession() {
 
         try {
@@ -42,7 +39,6 @@ public class JobListener implements JobExecutionListener {
         return session;
     }
 
-    @Bean(name = "channelSftp")
     public ChannelSftp openChannel() {
 
         try {
@@ -63,15 +59,21 @@ public class JobListener implements JobExecutionListener {
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        log.info("************************* AFTER STEP *************************");
-        channelSftp.exit();
-        log.info("Channel aperto: " + channelSftp.isConnected());
-        session.disconnect();
-        log.info("Sessione aperta: " + session.isConnected());
+
+    }
+
+    @Override
+    public void beforeStep(StepExecution stepExecution) {
+    }
+
+    @Nullable
+    @Override
+    public ExitStatus afterStep(StepExecution stepExecution) {
+
+        return null;
     }
 }

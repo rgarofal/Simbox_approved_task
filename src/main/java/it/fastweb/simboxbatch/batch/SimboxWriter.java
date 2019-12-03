@@ -35,7 +35,7 @@ public class SimboxWriter implements ItemWriter<List<SimboxTimestampIdx>> {
     }
 
     private int[] insertDb(List<SimboxTimestampIdx> simboxTimestampIdx) {
-        return jdbcTemplate.batchUpdate("INSERT INTO simbox_batch.simbox_timestamp_idx (date, folder, filename, dl) VALUES (?,?,?,?)",
+        return jdbcTemplate.batchUpdate("INSERT INTO simbox_timestamp_idx (date, folder, filename, dl) VALUES (?,?,?,?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -51,13 +51,5 @@ public class SimboxWriter implements ItemWriter<List<SimboxTimestampIdx>> {
                     }
                 }
         );
-    }
-
-    private String sendTMT (List<SimboxTimestampIdx> list) {
-
-
-
-
-        return null;
     }
 }
