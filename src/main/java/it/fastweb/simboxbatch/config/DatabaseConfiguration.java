@@ -15,7 +15,7 @@ public class DatabaseConfiguration {
 
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.cj.jdbc.Driver());
-        dataSource.setUrl("jdbc:mysql://localhost:3306/simbox_batch");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/simbox_batch?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
         dataSource.setSchema("simbox_batch");
@@ -27,7 +27,7 @@ public class DatabaseConfiguration {
 
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.cj.jdbc.Driver());
-        dataSource.setUrl("jdbc:mysql://localhost:3306/spr_batch_business");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/spr_batch_business?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
         dataSource.setSchema("spr_batch_business");
