@@ -4,27 +4,34 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import it.fastweb.simboxbatch.client.SessionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 
 public class JobListener implements JobExecutionListener, StepExecutionListener{
 
+    private final SessionClient sessionClient;
     private Session session;
     private ChannelSftp channelSftp;
     private static final Logger log = LoggerFactory.getLogger(JobListener.class);
 
+    @Autowired
+    public JobListener(SessionClient sessionClient) {
+        this.sessionClient = sessionClient;
+    }
+
     public Session openSession() {
 
         try {
-            String user = "rco";
-            int port = 2222;
-            String host = "93.41.198.4";
+            String user = sessionClient.getUser();
+            int port = sessionClient.getPort();
+            String host = sessionClient.getHost();
             JSch jsch = new JSch();
 
-            String privateKey = "C:\\Users\\delia\\IdeaProjects\\gs-batch-processing-master\\complete\\src\\main\\resources\\rco-sftp.ppk";
-            jsch.addIdentity(privateKey);
+            jsch.addIdentity(sessionClient.getPrivateKey());
             session = jsch.getSession(user, host, port);
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");

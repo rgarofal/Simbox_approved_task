@@ -1,9 +1,8 @@
 package it.fastweb.simboxbatch.config;
 
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.Session;
 import it.fastweb.simboxbatch.batch.SimboxReader;
 import it.fastweb.simboxbatch.batch.SimboxWriter;
+import it.fastweb.simboxbatch.client.SessionClient;
 import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,8 @@ public class JobConfiguration {
     private DataSource dataSource_business;
     @Autowired
     private SimpleJobLauncher jobLauncher;
+    @Autowired
+    private SessionClient sessionClient;
 
     private static final Logger log = LoggerFactory.getLogger(JobConfiguration.class);
     private static final JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
@@ -74,7 +75,7 @@ public class JobConfiguration {
         return launcher;
     }
 
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     public void runJobScheduled() throws Exception {
 
         log.info("Job Started at :" + new Date());
@@ -89,7 +90,7 @@ public class JobConfiguration {
     public Job simboxJob() {
         return jobBuilderFactory.get("simboxJob")
                 .incrementer(new RunIdIncrementer())
-                .listener(new JobListener())
+                .listener(new JobListener(sessionClient))
                 .flow(step1())
                 .end()
                 .build();
@@ -99,7 +100,7 @@ public class JobConfiguration {
     public Step step1() {
         return stepBuilderFactory.get("step1")
                 .<List<SimboxTimestampIdx>, List<SimboxTimestampIdx>>chunk(1)
-                .reader(new SimboxReader(dataSource_business))
+                .reader(new SimboxReader(dataSource_business, sessionClient))
                 .writer(new SimboxWriter(jdbcTemplate(dataSource_business)))
                 .startLimit(1)
                 .build();

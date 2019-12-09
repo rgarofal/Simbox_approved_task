@@ -2,6 +2,7 @@ package it.fastweb.simboxbatch.batch;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
+import it.fastweb.simboxbatch.client.SessionClient;
 import it.fastweb.simboxbatch.config.JobListener;
 import it.fastweb.simboxbatch.config.SimboxHttp;
 import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
@@ -23,18 +24,19 @@ import java.util.*;
 
 public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
+    private final SessionClient sessionClient;
     private Vector<ChannelSftp.LsEntry> fileList;
     private Date currentFileDate;
     private SimboxTimestampIdx s;
     private DataSource dataSource;
     private ChannelSftp channel;
     private Session session;
-    private JobListener jobListener = new JobListener();
     private static final Logger log = LoggerFactory.getLogger(SimboxReader.class);
 
     @Autowired
-    public SimboxReader(DataSource dataSource) {
+    public SimboxReader(DataSource dataSource, SessionClient sessionClient) {
         this.dataSource = dataSource;
+        this.sessionClient = sessionClient;
     }
 
     /**
@@ -45,11 +47,12 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
     @Override
     public List<SimboxTimestampIdx> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 
+        JobListener jobListener = new JobListener(sessionClient);
         session = jobListener.openSession();
         channel = jobListener.openChannel();
 
         try {
-            channel.cd("/home/rco/inventia_w/approved_csv");
+            channel.cd(sessionClient.getChannelPath());
             fileList = channel.ls("*.csv");
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,7 +144,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
             InputStream in = null;
             OutputStream out = null;
 
-            in = channel.get("/home/rco/inventia_w/approved_csv/" + f.getFilename());
+            in = channel.get(sessionClient.getChannelPath() + "/" + f.getFilename());
             out = new FileOutputStream(tmp);
 
             byte[] buf = new byte[1024];
@@ -158,7 +161,7 @@ public class SimboxReader implements ItemReader<List<SimboxTimestampIdx>> {
 
             csvFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
-            SimboxHttp simboxHttp = new SimboxHttp();
+            SimboxHttp simboxHttp = new SimboxHttp(sessionClient);
             simboxHttp.sendTicket(csvFile);
 
         } catch (Exception e) {
