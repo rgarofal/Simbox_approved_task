@@ -1,4 +1,4 @@
-package it.fastweb.simboxApproved;
+package it.fastweb.simbox.approved;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package it.fastweb.simboxApproved.model;
+package it.fastweb.simbox.approved.model;
 
 import java.util.Date;
 

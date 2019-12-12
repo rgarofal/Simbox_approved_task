@@ -1,10 +1,10 @@
-package it.fastweb.simboxApproved.config;
+package it.fastweb.simbox.approved.config;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-import it.fastweb.simboxApproved.client.SessionClient;
+import it.fastweb.simbox.approved.client.SessionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;

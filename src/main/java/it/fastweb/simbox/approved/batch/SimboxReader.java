@@ -1,12 +1,12 @@
-package it.fastweb.simboxApproved.batch;
+package it.fastweb.simbox.approved.batch;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
-import it.fastweb.simboxApproved.client.SessionClient;
-import it.fastweb.simboxApproved.config.JobListener;
-import it.fastweb.simboxApproved.config.SimboxHttp;
-import it.fastweb.simboxApproved.model.SimboxTimestampIdx;
-import it.fastweb.simboxApproved.config.SimboxRowMapper;
+import it.fastweb.simbox.approved.client.SessionClient;
+import it.fastweb.simbox.approved.config.JobListener;
+import it.fastweb.simbox.approved.config.SimboxHttp;
+import it.fastweb.simbox.approved.config.SimboxRowMapper;
+import it.fastweb.simbox.approved.model.SimboxTimestampIdx;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

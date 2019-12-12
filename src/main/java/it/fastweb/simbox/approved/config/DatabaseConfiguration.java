@@ -1,6 +1,6 @@
-package it.fastweb.simboxApproved.config;
+package it.fastweb.simbox.approved.config;
 
-import it.fastweb.simboxApproved.client.DataClient;
+import it.fastweb.simbox.approved.client.DataClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;

@@ -1,6 +1,6 @@
-package it.fastweb.simboxApproved.config;
+package it.fastweb.simbox.approved.config;
 
-import it.fastweb.simboxApproved.model.SimboxTimestampIdx;
+import it.fastweb.simbox.approved.model.SimboxTimestampIdx;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;

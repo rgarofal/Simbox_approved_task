@@ -1,9 +1,9 @@
-package it.fastweb.simboxApproved.config;
+package it.fastweb.simbox.approved.config;
 
-import it.fastweb.simboxApproved.batch.SimboxReader;
-import it.fastweb.simboxApproved.batch.SimboxWriter;
-import it.fastweb.simboxApproved.client.SessionClient;
-import it.fastweb.simboxApproved.model.SimboxTimestampIdx;
+import it.fastweb.simbox.approved.batch.SimboxReader;
+import it.fastweb.simbox.approved.batch.SimboxWriter;
+import it.fastweb.simbox.approved.client.SessionClient;
+import it.fastweb.simbox.approved.model.SimboxTimestampIdx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;

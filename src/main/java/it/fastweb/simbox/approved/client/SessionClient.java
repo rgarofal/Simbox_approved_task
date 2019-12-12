@@ -1,4 +1,4 @@
-package it.fastweb.simboxApproved.client;
+package it.fastweb.simbox.approved.client;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
