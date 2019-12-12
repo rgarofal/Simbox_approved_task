@@ -1,6 +1,6 @@
-package it.fastweb.simboxbatch.config;
+package it.fastweb.simboxApproved.config;
 
-import it.fastweb.simboxbatch.client.SessionClient;
+import it.fastweb.simboxApproved.client.SessionClient;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.client.ClientProtocolException;

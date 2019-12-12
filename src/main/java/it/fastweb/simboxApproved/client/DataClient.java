@@ -1,11 +1,10 @@
-package it.fastweb.simboxbatch.client;
+package it.fastweb.simboxApproved.client;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "simbox-batch")
+@ConfigurationProperties(prefix = "simbox-approved")
 public class DataClient {
 
     //configurazione db batch
@@ -19,7 +18,6 @@ public class DataClient {
     private String username_business;
     private String password_business;
     private String schema_business;
-
 
 
     public String getUrl_config() {

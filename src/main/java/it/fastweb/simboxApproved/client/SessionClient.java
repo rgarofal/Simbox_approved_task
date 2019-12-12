@@ -1,10 +1,10 @@
-package it.fastweb.simboxbatch.client;
+package it.fastweb.simboxApproved.client;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "simbox-batch")
+@ConfigurationProperties(prefix = "simbox-approved")
 public class SessionClient {
 
     //path channelSftp

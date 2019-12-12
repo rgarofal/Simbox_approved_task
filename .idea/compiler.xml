@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="simbox-approved" />
         <module name="simbox-batch" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="simbox-approved" target="1.8" />
       <module name="simbox-batch" target="1.8" />
     </bytecodeTargetLevel>
   </component>

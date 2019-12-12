@@ -1,9 +1,9 @@
-package it.fastweb.simboxbatch.config;
+package it.fastweb.simboxApproved.config;
 
-import it.fastweb.simboxbatch.batch.SimboxReader;
-import it.fastweb.simboxbatch.batch.SimboxWriter;
-import it.fastweb.simboxbatch.client.SessionClient;
-import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
+import it.fastweb.simboxApproved.batch.SimboxReader;
+import it.fastweb.simboxApproved.batch.SimboxWriter;
+import it.fastweb.simboxApproved.client.SessionClient;
+import it.fastweb.simboxApproved.model.SimboxTimestampIdx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
@@ -37,10 +37,10 @@ public class JobConfiguration {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
     @Autowired
-    @Qualifier("data_config")
+    @Qualifier("data_batch")
     private DataSource dataSource_config;
     @Autowired
-    @Qualifier("data_business")
+    @Qualifier("data_sales")
     private DataSource dataSource_business;
     @Autowired
     private SimpleJobLauncher jobLauncher;
@@ -52,7 +52,7 @@ public class JobConfiguration {
 
 
     @Bean(name = "jdbcTemplate")
-    JdbcTemplate jdbcTemplate(@Qualifier("data_business")DataSource dataSource_business) {
+    JdbcTemplate jdbcTemplate(@Qualifier("data_sales")DataSource dataSource_business) {
         return new JdbcTemplate(dataSource_business);
     }
 
@@ -62,7 +62,7 @@ public class JobConfiguration {
     }
 
     @Bean
-    public JobRepository jobRepository(@Qualifier("data_config")DataSource dataSource_config) throws Exception {
+    public JobRepository jobRepository(@Qualifier("data_batch")DataSource dataSource_config) throws Exception {
         jobRepositoryFactoryBean.setDataSource(dataSource_config);
         jobRepositoryFactoryBean.setTransactionManager(transactionManager());
         return jobRepositoryFactoryBean.getObject();
@@ -75,20 +75,20 @@ public class JobConfiguration {
         return launcher;
     }
 
-    @Scheduled(cron = "* */15 * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     public void runJobScheduled() throws Exception {
 
         log.info("Job Started at :" + new Date());
 
         JobParameters param = new JobParametersBuilder().addString("JobID", String.valueOf(System.currentTimeMillis())).toJobParameters();
-        JobExecution execution = jobLauncher.run(simboxJob(), param);
+        JobExecution execution = jobLauncher.run(simbox_approved(), param);
 
         log.info("Job finished with status :" + execution.getStatus());
     }
 
     @Bean
-    public Job simboxJob() {
-        return jobBuilderFactory.get("simboxJob")
+    public Job simbox_approved() {
+        return jobBuilderFactory.get("simbox_approved")
                 .incrementer(new RunIdIncrementer())
                 .listener(new JobListener(sessionClient))
                 .flow(step1())

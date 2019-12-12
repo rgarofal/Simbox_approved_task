@@ -1,6 +1,6 @@
-package it.fastweb.simboxbatch.batch;
+package it.fastweb.simboxApproved.batch;
 
-import it.fastweb.simboxbatch.model.SimboxTimestampIdx;
+import it.fastweb.simboxApproved.model.SimboxTimestampIdx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;

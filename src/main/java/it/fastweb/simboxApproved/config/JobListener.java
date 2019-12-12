@@ -1,18 +1,16 @@
-package it.fastweb.simboxbatch.config;
+package it.fastweb.simboxApproved.config;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-import it.fastweb.simboxbatch.SimboxApplication;
-import it.fastweb.simboxbatch.client.SessionClient;
+import it.fastweb.simboxApproved.client.SessionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 
-import java.net.URISyntaxException;
 import java.net.URL;
 
 public class JobListener implements JobExecutionListener, StepExecutionListener{

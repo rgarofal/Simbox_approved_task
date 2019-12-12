@@ -1,6 +1,6 @@
-package it.fastweb.simboxbatch.config;
+package it.fastweb.simboxApproved.config;
 
-import it.fastweb.simboxbatch.client.DataClient;
+import it.fastweb.simboxApproved.client.DataClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -19,7 +19,7 @@ public class DatabaseConfiguration {
         this.dataClient = dataClient;
     }
 
-    @Bean(name="data_config")
+    @Bean(name= "data_batch")
     @Primary
     public DataSource batchDataSource() throws SQLException {
 
@@ -32,8 +32,8 @@ public class DatabaseConfiguration {
         return dataSource;
     }
 
-    @Bean(name="data_business")
-    public DataSource businesDataSource() throws SQLException {
+    @Bean(name= "data_sales")
+    public DataSource salesDataSource() throws SQLException {
 
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.cj.jdbc.Driver());
