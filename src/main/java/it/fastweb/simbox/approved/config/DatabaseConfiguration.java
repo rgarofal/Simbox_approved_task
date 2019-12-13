@@ -37,10 +37,10 @@ public class DatabaseConfiguration {
 
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.cj.jdbc.Driver());
-        dataSource.setUrl(dataClient.getUrl_business());
-        dataSource.setUsername(dataClient.getUsername_business());
-        dataSource.setPassword(dataClient.getPassword_business());
-        dataSource.setSchema(dataClient.getSchema_business());
+        dataSource.setUrl(dataClient.getUrl_sales());
+        dataSource.setUsername(dataClient.getUsername_sales());
+        dataSource.setPassword(dataClient.getPassword_sales());
+        dataSource.setSchema(dataClient.getSchema_sales());
         return dataSource;
     }
 }

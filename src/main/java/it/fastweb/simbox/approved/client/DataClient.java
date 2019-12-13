@@ -14,10 +14,10 @@ public class DataClient {
     private String schema_config;
 
     //configurazione db tmt
-    private String url_business;
-    private String username_business;
-    private String password_business;
-    private String schema_business;
+    private String url_sales;
+    private String username_sales;
+    private String password_sales;
+    private String schema_sales;
 
 
     public String getUrl_config() {
@@ -52,35 +52,35 @@ public class DataClient {
         this.schema_config = schema_config;
     }
 
-    public String getUrl_business() {
-        return url_business;
+    public String getUrl_sales() {
+        return url_sales;
     }
 
-    public void setUrl_business(String url_business) {
-        this.url_business = url_business;
+    public void setUrl_sales(String url_sales) {
+        this.url_sales = url_sales;
     }
 
-    public String getUsername_business() {
-        return username_business;
+    public String getUsername_sales() {
+        return username_sales;
     }
 
-    public void setUsername_business(String username_business) {
-        this.username_business = username_business;
+    public void setUsername_sales(String username_sales) {
+        this.username_sales = username_sales;
     }
 
-    public String getPassword_business() {
-        return password_business;
+    public String getPassword_sales() {
+        return password_sales;
     }
 
-    public void setPassword_business(String password_business) {
-        this.password_business = password_business;
+    public void setPassword_sales(String password_sales) {
+        this.password_sales = password_sales;
     }
 
-    public String getSchema_business() {
-        return schema_business;
+    public String getSchema_sales() {
+        return schema_sales;
     }
 
-    public void setSchema_business(String schema_business) {
-        this.schema_business = schema_business;
+    public void setSchema_sales(String schema_sales) {
+        this.schema_sales = schema_sales;
     }
 }

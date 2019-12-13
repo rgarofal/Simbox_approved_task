@@ -14,7 +14,6 @@ public class SessionClient {
     private String user;
     private int port;
     private String host;
-    private String privateKey;
 
     //configurazione http
     private String post_url;
@@ -50,14 +49,6 @@ public class SessionClient {
 
     public void setHost(String host) {
         this.host = host;
-    }
-
-    public String getPrivateKey() {
-        return privateKey;
-    }
-
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
     }
 
     public String getPost_url() {

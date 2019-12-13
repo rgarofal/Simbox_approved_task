@@ -2,14 +2,7 @@
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="fileset" name="SimboxConfiguration" removed="false">
-          <file>file://$MODULE_DIR$/src/main/java/it/fastweb/simboxbatch/SimboxConfiguration.java</file>
-          <file>file://$MODULE_DIR$/src/main/java/it/fastweb/simboxbatch/SimboxProcessingApplication.java</file>
-          <file>file://$MODULE_DIR$/src/main/resources/context.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/job.xml</file>
-        </fileset>
-      </configuration>
+      <configuration />
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">

@@ -80,7 +80,7 @@ public class JobConfiguration {
 
         log.info("Job Started at :" + new Date());
 
-        JobParameters param = new JobParametersBuilder().addString("JobID", String.valueOf(System.currentTimeMillis())).toJobParameters();
+        JobParameters param = new JobParametersBuilder().addString("simbox_approved", String.valueOf(System.currentTimeMillis())).toJobParameters();
         JobExecution execution = jobLauncher.run(simbox_approved(), param);
 
         log.info("Job finished with status :" + execution.getStatus());
