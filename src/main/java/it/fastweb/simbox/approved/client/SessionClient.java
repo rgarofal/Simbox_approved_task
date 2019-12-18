@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "simbox-approved")
+@ConfigurationProperties(prefix = "simbox-batch")
 public class SessionClient {
 
     //path channelSftp

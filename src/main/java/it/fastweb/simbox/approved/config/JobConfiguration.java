@@ -75,7 +75,7 @@ public class JobConfiguration {
         return launcher;
     }
 
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "* */15 * * * *")
     public void runJobScheduled() throws Exception {
 
         log.info("Job Started at :" + new Date());
