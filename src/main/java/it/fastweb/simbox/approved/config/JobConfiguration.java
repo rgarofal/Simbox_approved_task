@@ -23,12 +23,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jmx.export.MBeanExporter;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.cloud.task.configuration.EnableTask;
 import javax.sql.DataSource;
+
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
+@EnableTask
 @Import({DatabaseConfiguration.class, MBeanExporter.class})
 public class JobConfiguration {
 
@@ -74,8 +78,8 @@ public class JobConfiguration {
         launcher.setJobRepository(jobRepository);
         return launcher;
     }
-
-    @Scheduled(cron = "* */15 * * * *")
+    @Bean
+    //@Scheduled(cron = "* */15 * * * *")
     public void runJobScheduled() throws Exception {
 
         log.info("Job Started at :" + new Date());
@@ -87,7 +91,7 @@ public class JobConfiguration {
     }
 
     @Bean
-    public Job simbox_approved() {
+    public Job simbox_approved() throws URISyntaxException {
         return jobBuilderFactory.get("simbox_approved")
                 .incrementer(new RunIdIncrementer())
                 .listener(new JobListener(sessionClient))
