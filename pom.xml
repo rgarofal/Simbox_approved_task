@@ -10,7 +10,7 @@
     </parent>
     <groupId>it.fastweb</groupId>
     <artifactId>simbox-approved</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1-PROD-SNAPSHOT</version>
     <name>simbox-approved</name>
 
     <properties>
